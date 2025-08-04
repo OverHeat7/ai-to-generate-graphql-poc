@@ -1,0 +1,56 @@
+type Query{
+    searchPOIs(
+        request: RequestModel!
+    ): [POI!]
+}
+
+# Inputs
+input RequestModel {
+    latitude: Float!,
+    longitude: Float!,
+    maxSearchDistance: Float = 10000,
+    maxResults: Int = 100,
+    searchQuery: String,
+    services: [POIService!],
+    isOpenNow: Boolean
+}
+
+# Types
+type POI {
+    id: ID!,
+    position: GeoPosition!,
+    name: String!,
+    country: String!,
+    state: String,
+    address: String,
+    open24h: Boolean,
+    services: [POIService!]!
+}
+
+type GeoPosition {
+    latitude: Float!,
+    longitude: Float!
+}
+
+# Enums
+enum POIService {
+    RESTAURANT,
+    BAR,
+    CAFE,
+    SHOP,
+    PARKING,
+    HOSPITAL,
+    SCHOOL,
+    BANK,
+    GAS_STATION,
+    CHARGING_STATION,
+    HOTEL,
+    MUSEUM,
+    LIBRARY,
+    GYM,
+    PHARMACY,
+    POST_OFFICE,
+    POLICE_STATION,
+    FIRE_STATION,
+    REST_AREA
+}

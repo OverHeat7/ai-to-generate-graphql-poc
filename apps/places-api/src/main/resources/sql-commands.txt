@@ -1,0 +1,25 @@
+-- 1. rename the old array column so we can rebuild it as a join table
+ALTER TABLE pois
+  RENAME COLUMN services TO services_txt;
+
+-- 2. create the new element-collection join table
+CREATE TABLE tblServices (
+  poi_id  bigint     NOT NULL,
+  service varchar(255) NOT NULL
+);
+
+-- 3. populate tblServices by unnesting the text[] directly
+INSERT INTO tblServices (poi_id, service)
+SELECT
+  id,
+  unnest(services_txt)
+FROM pois
+WHERE services_txt IS NOT NULL;
+
+-- 4. remove the original array column
+ALTER TABLE pois
+  DROP COLUMN services_txt;
+
+-- 5. speed up joins/lookups
+CREATE INDEX ON tblServices (poi_id);
+CREATE INDEX ON tblServices (service);
