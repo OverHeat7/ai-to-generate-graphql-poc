@@ -1,0 +1,12 @@
+server:
+  port: 8981
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql: trace
+
+llm:
+  callRealLLM: false
+  llmUrl: ${LLM_URL:http://localhost:8080}
+places:
+  url: ${PLACES_URL:http://localhost:8980/graphql}

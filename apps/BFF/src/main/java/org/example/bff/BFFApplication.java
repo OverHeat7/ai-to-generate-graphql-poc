@@ -1,12 +1,12 @@
-package org.example.places;
+package org.example.bff;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PlacesApplication {
+public class BFFApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PlacesApplication.class, args);
+        SpringApplication.run(BFFApplication.class, args);
     }
 }

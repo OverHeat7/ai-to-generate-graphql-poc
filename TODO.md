@@ -4,7 +4,7 @@
 ## Desenvolvimento de API para o projeto de IA
 
 - [x] Places API
-- [ ] BFF API (resposta da AI mockada)
+- [x] BFF API (resposta da AI mockada)
 - [ ] Criar conta AWS e Integração na AWS
 - [ ] testar modelo nao refinado e implementar
 - [ ] refinar o modelo e implementar again
