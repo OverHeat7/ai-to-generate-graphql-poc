@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.bff.model.RequestModel;
 import org.example.bff.service.BFFService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,11 +19,16 @@ public class V1Controller {
 
     @PostMapping
     public ResponseEntity<?> searchPOIs(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language") final String language) {
-        final Object response = service.processRequest(request,language);
+        final Object response = service.processRequest(request, language);
         if (response == null) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("OK");
     }
 }
 
