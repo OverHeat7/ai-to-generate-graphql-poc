@@ -35,7 +35,7 @@ jobs:
         working-directory: apps/places-api
         run: |
           aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
-          docker build -t places .
+          docker build --no-cache -t places .
           docker tag places:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
           docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
         env:
@@ -62,7 +62,7 @@ jobs:
         working-directory: apps/BFF
         run: |
           aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
-          docker build -t bff .
+          docker build --no-cache -t bff .
           docker tag bff:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
           docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
         env:
