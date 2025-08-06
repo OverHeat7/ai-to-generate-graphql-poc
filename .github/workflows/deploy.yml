@@ -1,0 +1,109 @@
+name: Deploy Applications
+on:
+  workflow_dispatch:
+    inputs:
+      places_api:
+        description: 'Deploy Places API'
+        default: true
+        type: boolean
+      bff:
+        description: 'Deploy BFF'
+        default: true
+        type: boolean
+      terraform:
+        description: 'Deploy Terraform'
+        default: true
+        type: boolean
+
+jobs:
+  deploy_places_api:
+    name: Deploy Places API
+    if: ${{ github.event.inputs.places_api }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2                         # default
+          verbose: false                     # default
+          arch: amd64                        # allowed values: amd64, x86, x64, arm, arm64
+
+      - name: Build Docker Image and send to ECR
+        working-directory: apps/places-api
+        run: |
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
+          docker build -t places .
+          docker tag places:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
+          docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-central-1
+
+  deploy_bff_api:
+    name: Deploy BFF
+    if: ${{ github.event.inputs.places_api }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2                         # default
+          verbose: false                     # default
+          arch: amd64                        # allowed values: amd64, x86, x64, arm, arm64
+
+      - name: Build Docker Image and send to ECR
+        working-directory: apps/BFF
+        run: |
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
+          docker build -t bff .
+          docker tag bff:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
+          docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-central-1
+  deploy_terraform:
+    name: Deploy Terraform
+    if: ${{ github.event.inputs.terraform }}
+    needs:
+      - deploy_places_api
+      - deploy_bff_api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2                         # default
+          verbose: false                     # default
+          arch: amd64                        # allowed values: amd64, x86, x64, arm, arm64
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: 1.12.2
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infrastructure
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-central-1
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: infrastructure
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-central-1

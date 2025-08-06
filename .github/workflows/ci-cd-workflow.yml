@@ -3,10 +3,6 @@ name: Build Spring Boot application with GitHub Actions
 on:
   #Manually trigger workflow runs
   workflow_dispatch:
-  #Trigger the workflow on push from the main branch
-  push:
-    branches:
-      - main
 jobs:
   # Build's job
   build-places-api:

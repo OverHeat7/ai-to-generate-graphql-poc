@@ -1,0 +1,36 @@
+[
+  {
+    "image": "${image}:latest",
+    "name": "${container_name}",
+    "portMappings": [
+      {
+        "containerPort": ${app_port},
+        "hostPort": ${app_port}
+      }
+    ],
+    "mountPoints": [],
+    "volumesFrom": [],
+    "environment": [
+      {
+        "name": "CALL_REAL_LLM",
+        "value": "${call_real_llm}"
+      },
+      {
+        "name": "LLM_URL",
+        "value": "${llm_url}"
+      },
+      {
+        "name": "PLACES_URL",
+        "value": "${places_url}"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${aws_log_group}",
+        "awslogs-region": "${aws_region}",
+        "awslogs-stream-prefix": "ecs"
+      }
+    }
+  }
+]
