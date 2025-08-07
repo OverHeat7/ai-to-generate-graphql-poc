@@ -22,7 +22,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_subnet" "public_subnet_a" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.20.0/24"
-  availability_zone       = "eu-central-1a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = "true"
 
   tags = {
@@ -33,7 +33,7 @@ resource "aws_subnet" "public_subnet_a" {
 resource "aws_subnet" "public_subnet_b" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.40.0/24"
-  availability_zone       = "eu-central-1b"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = "true"
 
   tags = {
@@ -44,7 +44,7 @@ resource "aws_subnet" "public_subnet_b" {
 resource "aws_subnet" "public_subnet_c" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.50.0/24"
-  availability_zone       = "eu-central-1c"
+  availability_zone       = "us-east-1c"
   map_public_ip_on_launch = "true"
 
   tags = {
@@ -169,7 +169,7 @@ resource "aws_nat_gateway" "nat_gw_c" {
 resource "aws_subnet" "private_subnet_a" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.10.0/24"
-  availability_zone       = "eu-central-1a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = "false"
   tags = {
     Name = "private-subnet-a"
@@ -180,7 +180,7 @@ resource "aws_subnet" "private_subnet_a" {
 resource "aws_subnet" "private_subnet_b" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.0.0/24"
-  availability_zone       = "eu-central-1b"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = "false"
   tags = {
     Name = "private-subnet-b"
@@ -191,7 +191,7 @@ resource "aws_subnet" "private_subnet_b" {
 resource "aws_subnet" "private_subnet_c" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.30.0/24"
-  availability_zone       = "eu-central-1c"
+  availability_zone       = "us-east-1c"
   map_public_ip_on_launch = "false"
   tags = {
     Name = "private-subnet-c"

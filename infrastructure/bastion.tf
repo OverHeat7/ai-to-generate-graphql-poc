@@ -2,7 +2,7 @@ resource "aws_instance" "Bastion" {
   count             = local.enable_bastion ? 1 : 0
   ami               = "ami-0233214e13e500f77"
   instance_type     = "t2.micro"
-  availability_zone = "eu-central-1a"
+  availability_zone = "us-east-1a"
   key_name          = "bastion-key"
   tenancy           = "default"
   subnet_id         = aws_subnet.public_subnet_a.id

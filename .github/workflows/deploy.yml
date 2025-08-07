@@ -34,14 +34,14 @@ jobs:
       - name: Build Docker Image and send to ECR
         working-directory: apps/places-api
         run: |
-          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.us-east-1.amazonaws.com
           docker build --no-cache -t places .
-          docker tag places:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
-          docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/places:latest
+          docker tag places:latest 673879563308.dkr.ecr.us-east-1.amazonaws.com/places:latest
+          docker push 673879563308.dkr.ecr.us-east-1.amazonaws.com/places:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-central-1
+          AWS_REGION: us-east-1
 
   deploy_bff_api:
     name: Deploy BFF
@@ -61,14 +61,14 @@ jobs:
       - name: Build Docker Image and send to ECR
         working-directory: apps/BFF
         run: |
-          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.eu-central-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 673879563308.dkr.ecr.us-east-1.amazonaws.com
           docker build --no-cache -t bff .
-          docker tag bff:latest 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
-          docker push 673879563308.dkr.ecr.eu-central-1.amazonaws.com/bff:latest
+          docker tag bff:latest 673879563308.dkr.ecr.us-east-1.amazonaws.com/bff:latest
+          docker push 673879563308.dkr.ecr.us-east-1.amazonaws.com/bff:latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-central-1
+          AWS_REGION: us-east-1
   deploy_terraform:
     name: Deploy Terraform
     if: ${{ github.event.inputs.terraform }}
@@ -98,7 +98,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-central-1
+          AWS_REGION: us-east-1
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
@@ -106,4 +106,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-central-1
+          AWS_REGION: us-east-1

@@ -6,7 +6,7 @@
 - [x] BFF API (resposta da AI mockada)
 - [x] Criar conta AWS e Integração na AWS
 - [ ] testar modelo nao refinado e implementar
-- [ ] refinar o modelo e implementar again
+- [ ] refinar o modelo e implementar again (https://docs.aws.amazon.com/bedrock/latest/userguide/custom-model-supported.html)
 
 ## Análise e Escrita de Tese
 - [ ] Analisar resultados do modelo refinado
