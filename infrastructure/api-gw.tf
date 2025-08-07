@@ -88,6 +88,8 @@ resource "aws_api_gateway_integration" "places_v1_ai_search_post" {
 }
 
 resource "aws_api_gateway_deployment" "places_deployment" {
+  depends_on = [aws_api_gateway_integration.places_v1_search_post,
+    aws_api_gateway_integration.places_v1_ai_search_post]
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
 
   triggers = {

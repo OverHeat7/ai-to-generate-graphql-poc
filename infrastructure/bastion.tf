@@ -1,6 +1,6 @@
 resource "aws_instance" "Bastion" {
   count             = local.enable_bastion ? 1 : 0
-  ami               = "ami-0233214e13e500f77"
+  ami               = "ami-084a7d336e816906b"
   instance_type     = "t2.micro"
   availability_zone = "us-east-1a"
   key_name          = "bastion-key"
