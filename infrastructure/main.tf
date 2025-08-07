@@ -13,5 +13,5 @@ terraform {
 }
 
 locals {
-  enable_bastion = true
+  enable_bastion = false
 }
