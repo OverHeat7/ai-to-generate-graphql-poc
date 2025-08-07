@@ -9,17 +9,18 @@ resource "aws_ecs_cluster" "cluster" {
 
 module "places-service" {
   source = "./modules/ecs-service"
+  depends_on = [aws_db_instance.postgres]
 
   component_name            = "places"
   task_definition_file_path = "${path.module}/files/places_task_definition.json"
   cpu                       = 512
   memory                    = 1024
   templatefile_arguments = {
-    db_host     = "todo"
-    db_port     = "todo"
-    db_name     = "todo"
-    db_user     = "todo"
-    db_password = "todo"
+    db_host     = aws_db_instance.postgres.address
+    db_port     = aws_db_instance.postgres.port
+    db_name     = "postgis"
+    db_user     = "postgis"
+    db_password = "password"
   }
   cluster_arn       = aws_ecs_cluster.cluster.arn
   nlb_arn           = aws_lb.nlb.arn
@@ -41,7 +42,7 @@ module "bff-service" {
   templatefile_arguments = {
     call_real_llm = "false"
     llm_url       = "todo"
-    places_url    = "http://${aws_lb.nlb.dns_name}:8980"
+    places_url    = "http://apps.private.com:8980/graphql"
   }
   cluster_arn       = aws_ecs_cluster.cluster.arn
   nlb_arn           = aws_lb.nlb.arn

@@ -1,3 +1,8 @@
+import files:
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres host=localhost port=5432 password=postgres" "pois.geojson" -sql "select cast(ID as INTEGER), name, country, state, formattedAddress, open24h, services from pois" -nln pois
+
+
+
 -- 1. rename the old array column so we can rebuild it as a join table
 ALTER TABLE pois
   RENAME COLUMN services TO services_txt;

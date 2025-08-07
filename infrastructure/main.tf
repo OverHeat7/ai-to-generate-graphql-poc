@@ -11,3 +11,7 @@ terraform {
     key = "terraform.tfstate"
   }
 }
+
+locals {
+  enable_bastion = true
+}

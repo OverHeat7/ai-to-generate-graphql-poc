@@ -4,12 +4,15 @@
     "name": "${container_name}",
     "portMappings": [
       {
+        "protocol": "tcp",
         "containerPort": ${app_port},
         "hostPort": ${app_port}
       }
     ],
     "mountPoints": [],
     "volumesFrom": [],
+    "systemControls": [],
+    "essential": true,
     "environment": [
       {
         "name": "DB_HOST",

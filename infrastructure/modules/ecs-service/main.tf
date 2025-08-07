@@ -31,11 +31,12 @@ resource "aws_ecs_task_definition" "task" {
 
 # Create ECS Service
 resource "aws_ecs_service" "ecs_service" {
-  name            = var.component_name
-  cluster         = var.cluster_arn
-  task_definition = aws_ecs_task_definition.task.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                 = var.component_name
+  cluster              = var.cluster_arn
+  task_definition      = aws_ecs_task_definition.task.arn
+  desired_count        = var.desired_count
+  launch_type          = "FARGATE"
+  force_new_deployment = false
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -47,5 +48,11 @@ resource "aws_ecs_service" "ecs_service" {
     target_group_arn = aws_lb_target_group.service_nlb_tg.arn
     container_name   = var.component_name
     container_port   = var.application_port
+  }
+
+  lifecycle {
+    ignore_changes = [
+      desired_count
+    ]
   }
 }
