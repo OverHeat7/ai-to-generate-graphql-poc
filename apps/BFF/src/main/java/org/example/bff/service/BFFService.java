@@ -1,6 +1,6 @@
 package org.example.bff.service;
 
-import org.example.bff.model.RequestModel;
+import org.example.bff.domain.request.RequestModel;
 
 public interface BFFService {
 

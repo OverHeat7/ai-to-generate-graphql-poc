@@ -1,7 +1,7 @@
 package org.example.bff.controller;
 
 import lombok.AllArgsConstructor;
-import org.example.bff.model.RequestModel;
+import org.example.bff.domain.request.RequestModel;
 import org.example.bff.service.BFFService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ public class V1Controller {
     private BFFService service;
 
     @PostMapping
-    public ResponseEntity<?> searchPOIs(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language") final String language) {
+    public ResponseEntity<?> speechSearch(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language") final String language) {
         final Object response = service.processRequest(request, language);
         if (response == null) {
             return ResponseEntity.noContent().build();

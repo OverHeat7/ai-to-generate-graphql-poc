@@ -4,7 +4,6 @@ type Query{
     ): [POI!]
 }
 
-# Inputs
 input RequestModel {
     latitude: Float!,
     longitude: Float!,
@@ -15,7 +14,6 @@ input RequestModel {
     isOpenNow: Boolean
 }
 
-# Types
 type POI {
     id: ID!,
     position: GeoPosition!,
@@ -32,7 +30,6 @@ type GeoPosition {
     longitude: Float!
 }
 
-# Enums
 enum POIService {
     RESTAURANT,
     BAR,

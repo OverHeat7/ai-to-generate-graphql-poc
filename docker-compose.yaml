@@ -2,9 +2,6 @@ services:
   postgis-places-api:
     container_name: places_database
     image: postgis/postgis:14-3.3
-    profiles:
-      - all
-      - places-api
     environment:
       POSTGRES_PASSWORD: postgis
       POSTGRES_DB: postgis
