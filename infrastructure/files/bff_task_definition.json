@@ -15,10 +15,6 @@
     "essential": true,
     "environment": [
       {
-        "name": "CALL_REAL_LLM",
-        "value": "${call_real_llm}"
-      },
-      {
         "name": "PLACES_URL",
         "value": "${places_url}"
       }
