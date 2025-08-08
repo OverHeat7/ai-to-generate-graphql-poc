@@ -1,53 +1,123 @@
-type Query{
+type Query {
+    """
+    Searches for Points of Interest (POIs).
+    - Filters results by location, services, search radius, and other criteria.
+    - Returns a list of matching POIs.
+    """
     searchPOIs(
         request: RequestModel!
     ): [POI!]
 }
 
 input RequestModel {
-    latitude: Float!,
-    longitude: Float!,
-    maxSearchDistance: Float = 10000,
-    maxResults: Int = 100,
-    searchQuery: String,
-    services: [POIService!],
+    """The latitude coordinate for the search."""
+    latitude: Float!
+
+    """The longitude coordinate for the search."""
+    longitude: Float!
+
+    """The maximum distance (in meters) from the provided coordinates to search for POIs."""
+    maxSearchDistance: Float = 10000
+
+    """The maximum number of POI results to return."""
+    maxResults: Int = 100
+
+    """A free-text search query to filter POIs by name only."""
+    searchQuery: String
+
+    """A list of specific services to filter POIs by (e.g., RESTAURANT, GAS_STATION) applies AND condition."""
+    services: [POIService!]
+
+    """If specified, will only returns POIs that are currently open or closed, depending on the value."""
     isOpenNow: Boolean
 }
 
 type POI {
-    id: ID!,
-    position: GeoPosition!,
-    name: String!,
-    country: String!,
-    state: String,
-    address: String,
-    open24h: Boolean,
+    id: ID!
+
+    """The geographical position (latitude and longitude) of the POI."""
+    position: GeoPosition!
+
+    """The name of the POI."""
+    name: String!
+
+    """The country where the POI is located."""
+    country: String!
+
+    """The state or region where the POI is located (if applicable)."""
+    state: String
+
+    """The street address or descriptive location of the POI."""
+    address: String
+
+    """Whether the POI is open 24 hours a day."""
+    open24h: Boolean
+
+    """A list of services offered by the POI."""
     services: [POIService!]!
 }
 
+
 type GeoPosition {
-    latitude: Float!,
+    latitude: Float!
     longitude: Float!
 }
 
 enum POIService {
-    RESTAURANT,
-    BAR,
-    CAFE,
-    SHOP,
-    PARKING,
-    HOSPITAL,
-    SCHOOL,
-    BANK,
-    GAS_STATION,
-    CHARGING_STATION,
-    HOTEL,
-    MUSEUM,
-    LIBRARY,
-    GYM,
-    PHARMACY,
-    POST_OFFICE,
-    POLICE_STATION,
-    FIRE_STATION,
+    """A place where food is prepared and served to customers."""
+    RESTAURANT
+
+    """An establishment licensed to serve alcoholic drinks."""
+    BAR
+
+    """A coffeehouse or café offering drinks and light meals."""
+    CAFE
+
+    """A retail store selling goods."""
+    SHOP
+
+    """A designated area for parking vehicles."""
+    PARKING
+
+    """A medical facility providing treatment and care."""
+    HOSPITAL
+
+    """An educational institution for learning."""
+    SCHOOL
+
+    """A financial institution offering banking services."""
+    BANK
+
+    """A facility that sells fuel for vehicles."""
+    GAS_STATION
+
+    """A location where electric vehicles can recharge batteries."""
+    CHARGING_STATION
+
+    """A place offering lodging for travelers."""
+    HOTEL
+
+    """A building or location exhibiting artifacts and works of art."""
+    MUSEUM
+
+    """A facility for reading, borrowing, and studying books and other materials."""
+    LIBRARY
+
+    """A fitness center for exercise and training."""
+    GYM
+
+    """A store dispensing prescription and non-prescription medications."""
+    PHARMACY
+
+    """A facility that handles mail services."""
+    POST_OFFICE
+
+    """A police department or law enforcement office."""
+    POLICE_STATION
+
+    """A fire department facility."""
+    FIRE_STATION
+
+    """A designated roadside area for rest and refreshment."""
     REST_AREA
 }

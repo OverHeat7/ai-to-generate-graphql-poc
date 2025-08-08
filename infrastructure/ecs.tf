@@ -40,8 +40,7 @@ module "bff-service" {
   cpu                       = 512
   memory                    = 1024
   templatefile_arguments = {
-    call_real_llm = "false"
-    llm_url       = "todo"
+    call_real_llm = "true"
     places_url    = "http://apps.private.com:8980/graphql"
   }
   cluster_arn       = aws_ecs_cluster.cluster.arn

@@ -19,10 +19,6 @@
         "value": "${call_real_llm}"
       },
       {
-        "name": "LLM_URL",
-        "value": "${llm_url}"
-      },
-      {
         "name": "PLACES_URL",
         "value": "${places_url}"
       }

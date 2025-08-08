@@ -54,6 +54,10 @@ public class LLMInstructionsGenerator {
             6. Validation and errors:
               - If any referenced name (type, field, argument, input) is not present in the schema, return `ERROR:<missing name(s)>`.
               - If the prompt is ambiguous (e.g., both `Query.user(id: ID!)` and `Query.users(filter: UserFilter)` exist and the prompt doesn't specify), return `ERROR:` explaining the ambiguity and what is needed (id or filter).
+              - If the prompt asks for an operation that cannot be performed (e.g., the graphql server only searches for food by name, but the prompt asks for all foods of color yellow), return `ERROR:` explaining the limitation.
+               (other e.g., the graphql allows searching by multiple fields, but only with AND logic, but the prompt asks for OR logic).
+              - If the prompt requests a logical condition (e.g., search by attributes with AND/OR) but the schema specifies that the corresponding filter input supports only the opposite logic, return ERROR: explaining that the requested logic is unsupported by the server.
+              - If the prompt asks for a field that is not present in the schema, return `ERROR:FieldNotFound — field '<fieldName>' does not exist in type '<TypeName>'`.
             7. Leaf-type rule:
               - If a field's type is an `ENUM` or `SCALAR` (including custom scalars), it is a leaf: **do not** produce a selection set or inline fragment for it.
               - If a planned selection includes subselections for a leaf type, return:

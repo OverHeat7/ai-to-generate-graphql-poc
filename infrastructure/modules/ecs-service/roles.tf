@@ -51,7 +51,8 @@ resource "aws_iam_role_policy" "extra_policies" {
           "cloudwatch:*",
           "aurora:*",
           "ecs:*",
-          "ecr:*"
+          "ecr:*",
+          "bedrock:InvokeModel"
         ],
         "Effect" : "Allow",
         "Resource" : "*"

@@ -51,7 +51,6 @@ public class LLMServiceImpl implements LLMService {
         llmContext.putIfAbsent("language", language);
 
         final String prompt = generatePrompt(graphQlSchema, textPrompt, llmModel, llmContext.toString());
-        log.info("Generated prompt for LLM: {}", prompt);
         try {
             // Encode and send the request to the Bedrock Runtime.
             var response = bedrockRuntimeClient.invokeModel(request -> request
@@ -69,10 +68,8 @@ public class LLMServiceImpl implements LLMService {
 
     private String refineQuery(final String unprocessedQuery) {
         String query = unprocessedQuery.replace("\n", " ");
-        String queryAux = query.replace("  ", " ");
-        while (!query.equals(queryAux)) {
-            query = queryAux;
-            queryAux = query.replace("  ", " ");
+        while (query.contains("  ")) {
+            query = query.replace("  ", " ");
         }
         return query.trim();
     }

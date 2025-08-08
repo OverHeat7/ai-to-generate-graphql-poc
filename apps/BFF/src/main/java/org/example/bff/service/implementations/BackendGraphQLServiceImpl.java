@@ -1,6 +1,5 @@
 package org.example.bff.service.implementations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.AstPrinter;
 import graphql.language.Document;
@@ -100,7 +99,9 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
                 .retrieve()
                 .body(Map.class);
         final Document schema = introspectionResultToSchema.createSchemaDefinition((Map<String, Object>) introspectionResult.get("data"));
-        return AstPrinter.printAst(schema);
+        return AstPrinter.printAst(schema)
+                .replace("\r\n", "\n") // Remove carriage returns
+                .replaceAll(" {2,}", " "); // Replace multiple spaces with a single space
     }
 
     @Override
