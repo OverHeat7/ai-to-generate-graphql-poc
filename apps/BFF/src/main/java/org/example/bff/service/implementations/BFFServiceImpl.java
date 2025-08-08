@@ -20,7 +20,7 @@ public class BFFServiceImpl implements BFFService {
     public Object processRequest(final RequestModel request, final String language) {
         log.info("Processing request: {}", request);
         final String graphQlSchema = backendGraphQLService.fetchGraphQLSchema();
-        final String query = llmService.generateGraphQLQuery(graphQlSchema, request.getTextPrompt(), language, request.getContext(), request.getLlmModel());
+        final String query = llmService.generateGraphQLQuery(graphQlSchema, request.getTextPrompt(), language, request.getContext(), request.getLlmModel(), request.isShouldCallRealLLM());
         return backendGraphQLService.queryGraphQLServer(query);
     }
 }

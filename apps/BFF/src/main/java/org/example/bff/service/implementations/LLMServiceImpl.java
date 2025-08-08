@@ -3,7 +3,6 @@ package org.example.bff.service.implementations;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.bff.domain.llm.LLMModel;
-import org.example.bff.properties.LLMProperties;
 import org.example.bff.service.LLMService;
 import org.example.bff.utils.LLMInstructionsGenerator;
 import org.json.JSONObject;
@@ -23,17 +22,16 @@ import java.util.Map;
 public class LLMServiceImpl implements LLMService {
     private static final String QUERY_FORMAT = "{ \"query\": \"%s\" }";
     private static final String MOCKED_QUERY_VALUE = "{ searchPOIs( request: { latitude: 30.33218380000011 longitude: -81.655651 maxSearchDistance: 100000 isOpenNow: true services: [PHARMACY] searchQuery: \\\"2\\\" maxResults: 5 } ) { id name country services state address open24h position { latitude longitude } } }";
-    private LLMProperties properties;
     private LLMInstructionsGenerator instructionsGenerator;
     private BedrockRuntimeClient bedrockRuntimeClient;
 
     @Override
     public String generateGraphQLQuery(final String graphQlSchema, final String textPrompt, final String language,
-                                       final Map<String, Object> context, final LLMModel llmModel) {
+                                       final Map<String, Object> context, final LLMModel llmModel, boolean shouldCallRealLLM) {
         // Log the parameters received
         log.info("Generating GraphQL query with textPrompt: {}, language: {}, context: {}", textPrompt, language, context);
         final String query;
-        if (properties.isCallRealLLM()) {
+        if (shouldCallRealLLM) {
             query = fecthQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel);
         } else {
             query = MOCKED_QUERY_VALUE;

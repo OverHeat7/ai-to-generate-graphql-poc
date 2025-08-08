@@ -1,0 +1,9 @@
+# SHOULD WORK
+dá me 20 restaurantes abertos com parque de estacionamento
+
+
+
+# SHOULD FAIL
+dá me 20 restaurantes abertos com parque de estacionamento e dá-me a informação do preço do parque -> should fail because the backend api does not support price of parking
+quero ou cafés ou restaurantes -> should fail because the backend api does not support OR queries, only AND queries and this information is available in the schema
+quero ou cafés ou restaurantes, um ou outro -> should fail because the backend api does not support OR queries, only AND queries and this information is available in the schema

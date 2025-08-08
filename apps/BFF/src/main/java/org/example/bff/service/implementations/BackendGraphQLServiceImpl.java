@@ -84,7 +84,7 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
 
     public BackendGraphQLServiceImpl(final PlacesProperties placesProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(placesProperties.getUrl())
+                .baseUrl(placesProperties.getGraphqlUrl())
                 .build();
         this.introspectionResultToSchema = new IntrospectionResultToSchema();
     }

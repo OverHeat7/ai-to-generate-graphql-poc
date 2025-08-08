@@ -5,7 +5,5 @@ logging:
   level:
     org.hibernate.type.descriptor.sql: trace
 
-llm:
-  callRealLLM: ${CALL_REAL_LLM:true}
-places:
-  url: ${PLACES_URL:http://localhost:8980/graphql}
+backend:
+  graphql-url: ${PLACES_URL:http://localhost:8980/graphql}

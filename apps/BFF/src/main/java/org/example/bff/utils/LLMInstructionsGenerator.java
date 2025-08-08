@@ -26,7 +26,8 @@ public class LLMInstructionsGenerator {
             - **Filling required inputs:** For any required (non-null) argument or input field found in the schema, try to find a value in this order:
              1. explicit value in the `prompt` (e.g., `id = "123"`);
              2. matching key/value in `context` (e.g., `latitude`, `longitude`, `userId`);
-             3. if neither provides it, return `ERROR:` listing the missing required argument(s).
+             3. If a required value is not given explicitly but can be unambiguously inferred from another prompt value (directly or indirectly), infer it. Example: if schema requires countryCode but prompt gives "country": "Portugal", derive countryCode: "PT". Only make inferences that are widely known, deterministic mappings (e.g., country names ↔ ISO codes, common currency symbols ↔ codes). If no confident mapping exists, treat as missing and return ERROR:.
+             4. if neither provides it, return `ERROR:` listing the missing required argument(s).
             - **Nested inputs:** If the schema expects an input object, `context` may provide nested maps; merge prompt-specified nested fields over context-specified nested fields.
             - **Variables vs literals:** Inline values as literals unless the prompt explicitly requests variable usage. Values taken from `context` are also inlined unless variables are requested.
             - **Type coercion:** Convert context/prompt values to the correct GraphQL literal form:
