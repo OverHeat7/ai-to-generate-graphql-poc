@@ -1,5 +1,6 @@
 resource "aws_route53_zone" "private_zone" {
-  name = "private.com"
+  count = local.deploy_places || local.deploy_bff ? 1 : 0
+  name  = "private.com"
 
   vpc {
     vpc_id = aws_vpc.vpc.id
@@ -7,13 +8,14 @@ resource "aws_route53_zone" "private_zone" {
 }
 
 resource "aws_route53_record" "apps" {
-  zone_id = aws_route53_zone.private_zone.zone_id
+  count   = local.deploy_places || local.deploy_bff ? 1 : 0
+  zone_id = aws_route53_zone.private_zone[0].zone_id
   name    = "apps.private.com"
   type    = "A"
 
   alias {
-    name                   = aws_lb.nlb.dns_name
-    zone_id                = aws_lb.nlb.zone_id
+    name                   = aws_lb.nlb[0].dns_name
+    zone_id                = aws_lb.nlb[0].zone_id
     evaluate_target_health = true
   }
 }

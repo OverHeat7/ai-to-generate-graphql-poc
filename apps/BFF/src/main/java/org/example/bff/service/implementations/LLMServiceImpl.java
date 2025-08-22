@@ -1,8 +1,13 @@
 package org.example.bff.service.implementations;
 
+import io.github.sashirestela.openai.SimpleOpenAI;
+import io.github.sashirestela.openai.domain.chat.ChatMessage;
+import io.github.sashirestela.openai.domain.chat.ChatRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.bff.domain.llm.LLMModel;
+import org.example.bff.domain.llm.LLMResponse;
+import org.example.bff.domain.llm.LLMResponseStatus;
 import org.example.bff.service.LLMService;
 import org.example.bff.utils.LLMInstructionsGenerator;
 import org.json.JSONObject;
@@ -11,7 +16,13 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
+import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
+import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
+import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
+import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
+import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,85 +31,148 @@ import java.util.Map;
 @Slf4j
 @AllArgsConstructor
 public class LLMServiceImpl implements LLMService {
-    private static final String QUERY_FORMAT = "{ \"query\": \"%s\" }";
-    private static final String MOCKED_QUERY_VALUE = "{ searchPOIs( request: { latitude: 30.33218380000011 longitude: -81.655651 maxSearchDistance: 100000 isOpenNow: true services: [PHARMACY] searchQuery: \\\"2\\\" maxResults: 5 } ) { id name country services state address open24h position { latitude longitude } } }";
+    private static final String MOCKED_QUERY_VALUE = "{ searchPOIs( request: { latitude: 30.33218380000011 longitude: -81.655651 maxSearchDistance: 100000 isOpenNow: true services: [PHARMACY] searchQuery: \"2\" maxResults: 5 } ) { id name country services state address open24h position { latitude longitude } } }";
     private LLMInstructionsGenerator instructionsGenerator;
     private BedrockRuntimeClient bedrockRuntimeClient;
+    private SimpleOpenAI openAi;
 
     @Override
-    public String generateGraphQLQuery(final String graphQlSchema, final String textPrompt, final String language,
-                                       final Map<String, Object> context, final LLMModel llmModel, boolean shouldCallRealLLM) {
+    public LLMResponse generateGraphQLQuery(final String graphQlSchema, final String textPrompt, final String language,
+                                            final Map<String, Object> context, final LLMModel llmModel, boolean shouldCallRealLLM,
+                                            boolean returnLLMResponse) {
         // Log the parameters received
         log.info("Generating GraphQL query with textPrompt: {}, language: {}, context: {}", textPrompt, language, context);
-        final String query;
+        final LLMResponse response;
         if (shouldCallRealLLM) {
-            query = fecthQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel);
+            response = fecthQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel, returnLLMResponse);
         } else {
-            query = MOCKED_QUERY_VALUE;
+            response = new LLMResponse(LLMResponseStatus.SUCCESS, MOCKED_QUERY_VALUE);
         }
-        return QUERY_FORMAT.formatted(query);
+        return response;
     }
 
-    private String fecthQueryFromLLM(final String graphQlSchema, final String textPrompt, final String language,
-                                     final Map<String, Object> context, final LLMModel llmModel) {
-        // TODO: Implement the actual call to the LLM service.
-        final Map<String, Object> llmContext = new HashMap<>();
-        if (context != null) {
-            llmContext.putAll(context);
-        }
-        llmContext.putIfAbsent("language", language);
+    private LLMResponse fecthQueryFromLLM(final String graphQlSchema, final String textPrompt, final String language,
+                                          final Map<String, Object> context, final LLMModel llmModel,
+                                          boolean returnLLMResponse) {
+        final Map<String, Object> llmContext = generateLLMContext(language, context);
 
         final String prompt = generatePrompt(graphQlSchema, textPrompt, llmModel, llmContext.toString());
         try {
-            // Encode and send the request to the Bedrock Runtime.
-            var response = bedrockRuntimeClient.invokeModel(request -> request
-                    .body(SdkBytes.fromUtf8String(prompt))
-                    .modelId(llmModel.getModelId())
-            );
-
-            final String unprocessedQuery = processLLMResponse(response, llmModel);
-            return refineQuery(unprocessedQuery);
+            return switch (llmModel) {
+                case NOVA_PRO, TUNED_NOVA_PRO -> getLLMResponseNova(llmModel, prompt, returnLLMResponse);
+                case GPT_4_1_MINI, TUNED_GPT_4_1_MINI -> getGPTResponse(llmModel, prompt, returnLLMResponse);
+                default -> getLlmResponseDefault(llmModel, prompt);
+            };
         } catch (SdkClientException e) {
             System.err.printf("ERROR: Can't invoke '%s'. Reason: %s", llmModel.getModelId(), e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    private String refineQuery(final String unprocessedQuery) {
-        String query = unprocessedQuery.replace("\n", " ");
-        while (query.contains("  ")) {
-            query = query.replace("  ", " ");
+    private LLMResponse getLLMResponseNova(final LLMModel llmModel, final String prompt, boolean returnLLMResponse) {
+        final Message message = Message.builder()
+                .content(ContentBlock.fromText(prompt))
+                .role(ConversationRole.USER)
+                .build();
+        final ConverseRequest.Builder request = ConverseRequest.builder()
+                .modelId(llmModel.getModelId())
+                .messages(message)
+                .inferenceConfig(config -> config
+                        .maxTokens(500)
+                        .temperature(0F)
+                        .topP(0F)
+                );
+        if (llmModel.isFineTuned()) {
+            request.system(SystemContentBlock.builder()
+                    .text("Generate a <OK/INFO/ERROR>:<message/query> according to the user instruction")
+                    .build());
         }
-        return query.trim();
+        final String response = bedrockRuntimeClient.converse(request.build()).output().message().content().getFirst().text();
+        if (returnLLMResponse) {
+            return getLlmResponseRaw(response);
+        }
+        return createLLMResponseFromActualResponse(response).refineQuery();
     }
 
-    private String processLLMResponse(final InvokeModelResponse response, final LLMModel llmModel) {
+    private static LLMResponse getLlmResponseRaw(String response) {
+        final LLMResponse llmResponse = new LLMResponse(LLMResponseStatus.SUCCESS, response);
+        if (response != null && response.startsWith("OK:")) {
+            llmResponse.refineQuery();
+        }
+        return llmResponse;
+    }
+
+    private LLMResponse getGPTResponse(final LLMModel llmModel, final String prompt, boolean returnLLMResponse) {
+        final ChatRequest chatRequest = ChatRequest.builder()
+                .model(llmModel.getModelId())
+                .message(ChatMessage.UserMessage.of(prompt))
+                .temperature(0.0)
+                .maxCompletionTokens(300)
+                .build();
+        var futureChat = openAi.chatCompletions().create(chatRequest);
+        final String response = futureChat.join().firstContent();
+        if (returnLLMResponse) {
+            return getLlmResponseRaw(response);
+        }
+        return createLLMResponseFromActualResponse(response).refineQuery();
+    }
+
+    private LLMResponse getLlmResponseDefault(LLMModel llmModel, String prompt) {
+        // Encode and send the request to the Bedrock Runtime.
+        var response = bedrockRuntimeClient.invokeModel(request -> request
+                .body(SdkBytes.fromUtf8String(prompt))
+                .modelId(llmModel.getModelId())
+        );
+        return fetchLLMResponse(response, llmModel).refineQuery();
+    }
+
+    private Map<String, Object> generateLLMContext(String language, Map<String, Object> context) {
+        final Map<String, Object> llmContext = new HashMap<>();
+        if (context != null) {
+            llmContext.putAll(context);
+        }
+        llmContext.putIfAbsent("language", language);
+
+        if (llmContext.containsKey("language")) {
+            final String newLanguage = llmContext.get("language").toString().toLowerCase()
+                    .replace("_", "-").trim();
+            llmContext.put("language", newLanguage);
+        }
+
+        return llmContext;
+    }
+
+    private LLMResponse fetchLLMResponse(final InvokeModelResponse invokeResponse, final LLMModel llmModel) {
         // Decode the response body.
-        var responseBody = new JSONObject(response.body().asUtf8String());
+        final JSONObject responseBody = new JSONObject(invokeResponse.body().asUtf8String());
 
         // Retrieve the generated text from the model's response.
-        var text = new JSONPointer(llmModel.getResponsePath()).queryFrom(responseBody).toString();
+        final String rawResponse = new JSONPointer(llmModel.getResponsePath()).queryFrom(responseBody).toString();
 
+        return createLLMResponseFromActualResponse(rawResponse);
+    }
+
+    private static LLMResponse createLLMResponseFromActualResponse(final String rawResponse) {
         // extract the first "<chars>:" from the text, if it exists and remove it
-        if (text.startsWith("OK:")) {
-            text = text.substring(3).trim();
-        } else if (text.startsWith("ERROR:")) {
-            text = text.substring(6).trim();
-            throw new RuntimeException("LLM returned an error: " + text);
+        final LLMResponse response;
+        if (rawResponse.startsWith("OK:")) {
+            response = new LLMResponse(LLMResponseStatus.SUCCESS, rawResponse.substring(3).trim());
+        } else if (rawResponse.startsWith("SUCCESS:")) {
+            response = new LLMResponse(LLMResponseStatus.SUCCESS, rawResponse.substring(8).trim());
+        } else if (rawResponse.startsWith("ERROR:")) {
+            response = new LLMResponse(LLMResponseStatus.ERROR, rawResponse.substring(6).trim());
+        } else if (rawResponse.startsWith("INFO:")) {
+            response = new LLMResponse(LLMResponseStatus.INFO, rawResponse.substring(5).trim());
         } else {
-            throw new RuntimeException("LLM response did not start with 'OK:' or 'ERROR:'. Response: " + text);
+            throw new RuntimeException("LLM response did not start with 'OK:', 'SUCCESS:', 'INFO:' or 'ERROR:'. Response: " + rawResponse);
         }
-        return text;
+        return response;
     }
 
     private String generatePrompt(final String graphQlSchema, final String textPrompt, final LLMModel llmModel,
                                   final String llmContext) {
-        if (llmModel.isFineTuned()) {
-            // TODO: Implement fine-tuned model prompt generation
-            throw new UnsupportedOperationException("Fine-tuned model prompt generation is not implemented yet.");
-        }
         return llmModel.getPromptTemplate()
-                .formatted(instructionsGenerator.generateNotFineTunedInstruction(llmContext, textPrompt, graphQlSchema));
+                .formatted(instructionsGenerator.generateFullInstructionsWithQuery(llmModel, llmContext, textPrompt, graphQlSchema));
     }
 
 

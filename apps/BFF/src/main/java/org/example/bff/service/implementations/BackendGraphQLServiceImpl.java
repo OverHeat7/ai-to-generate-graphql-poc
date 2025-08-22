@@ -4,7 +4,7 @@ import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.AstPrinter;
 import graphql.language.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.example.bff.properties.PlacesProperties;
+import org.example.bff.properties.BackendProperties;
 import org.example.bff.service.BackendGraphQLService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
@@ -82,9 +82,9 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
     private final RestClient restClient;
     private final IntrospectionResultToSchema introspectionResultToSchema;
 
-    public BackendGraphQLServiceImpl(final PlacesProperties placesProperties) {
+    public BackendGraphQLServiceImpl(final BackendProperties backendProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(placesProperties.getGraphqlUrl())
+                .baseUrl(backendProperties.getGraphqlUrl())
                 .build();
         this.introspectionResultToSchema = new IntrospectionResultToSchema();
     }
@@ -106,9 +106,10 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
 
     @Override
     public Object queryGraphQLServer(final String query) {
+        final Map<String, Object> body = Map.of("query", query);
         return restClient.post()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(query)
+                .body(body)
                 .retrieve()
                 .body(Object.class);
     }

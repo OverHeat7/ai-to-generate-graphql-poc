@@ -1,4 +1,5 @@
 resource "aws_lb" "nlb" {
+  count = local.deploy_places || local.deploy_bff ? 1 : 0
   name               = "my-network-loadbalancer"
   load_balancer_type = "network"
   security_groups = [aws_security_group.allow_all_traffic.id]

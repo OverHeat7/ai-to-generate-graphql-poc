@@ -7,6 +7,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "backend")
-public class PlacesProperties {
+public class BackendProperties {
     private String graphqlUrl;
 }

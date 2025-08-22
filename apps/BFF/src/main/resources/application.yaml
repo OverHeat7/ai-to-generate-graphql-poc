@@ -7,3 +7,8 @@ logging:
 
 backend:
   graphql-url: ${PLACES_URL:http://localhost:8980/graphql}
+
+llm:
+  gpt-api-key: ${GPT_API_KEY:}
+  gpt-organization-id: ${ORGANIZATION_ID:}
+  gpt-project-id: ${PROJECT_ID:}

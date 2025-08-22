@@ -198,6 +198,41 @@ resource "aws_subnet" "private_subnet_c" {
   }
 }
 
+
+# Create private subnet D
+resource "aws_subnet" "private_subnet_d" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.70.0/24"
+  availability_zone       = "us-east-1d"
+  map_public_ip_on_launch = "false"
+  tags = {
+    Name = "private-subnet-d"
+  }
+}
+
+
+# Create private subnet E
+resource "aws_subnet" "private_subnet_e" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.80.0/24"
+  availability_zone       = "us-east-1e"
+  map_public_ip_on_launch = "false"
+  tags = {
+    Name = "private-subnet-e"
+  }
+}
+
+# Create private subnet F
+resource "aws_subnet" "private_subnet_f" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.60.0/24"
+  availability_zone       = "us-east-1f"
+  map_public_ip_on_launch = "false"
+  tags = {
+    Name = "private-subnet-f"
+  }
+}
+
 # Create NACL for private subnet
 resource "aws_network_acl" "private_subnet_nacl" {
   vpc_id = aws_vpc.vpc.id

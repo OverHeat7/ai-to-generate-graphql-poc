@@ -18,12 +18,8 @@ public class V1Controller {
     private BFFService service;
 
     @PostMapping
-    public ResponseEntity<?> speechSearch(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language") final String language) {
-        final Object response = service.processRequest(request, language);
-        if (response == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> speechSearch(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language", defaultValue = "en-gb") final String language) {
+        return service.processRequest(request, language);
     }
 
     @GetMapping("health")
