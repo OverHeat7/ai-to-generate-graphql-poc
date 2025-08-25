@@ -1,0 +1,31 @@
+@startuml
+actor User
+participant "Front Service" as FrontService
+participant "API Pesquisa" as APIPesquisa
+participant "LLM\n(e.g. GPT 4.1 Mini)" as llm
+
+
+activate User
+User -> FrontService: {\n\t"textPrompt": "Parques de estacionamento abertos",\n\t"context": {\n\t\t"longitude": -81.655651,\n\t\t"latitude": 30.3321838,\n\t}\n}
+activate FrontService
+FrontService -> APIPesquisa : GET GraphQL Schema
+activate APIPesquisa
+return GraphQL Schema\n(cached in Front Service)
+FrontService -> llm: Generate Query or Information\n(textPrompt + context + schema)
+activate llm
+return “OK:<query|mutation>”, “ERROR:<mensagem>” ou “INFO:<mensagem>”
+alt ERROR (was not able to generate query/mutation)
+    FrontService -> User: 400 Bad Request\n{error}
+else INFO (the user requested information)
+    FrontService -> User: 200 OK\n{info}
+else OK (was hable to generate query/mutation)
+    FrontService -> FrontService: validate <query|mutation>
+    FrontService -> APIPesquisa: Execute <query|mutation>
+    activate APIPesquisa
+    APIPesquisa -> FrontService: 200 OK\n{dados}\nOU\n500 Internal Server Error\n{error}
+    deactivate APIPesquisa
+    FrontService -> User: 200 OK\n{dados}\nOU\n500 Internal Server Error\n{error}
+    deactivate FrontService
+    deactivate User
+end
+@enduml
