@@ -11,16 +11,12 @@ import org.example.bff.domain.llm.LLMResponseStatus;
 import org.example.bff.metrics.BFFMetrics;
 import org.example.bff.infrastructure.LLMRequest;
 import org.example.bff.utils.LLMInstructionsGenerator;
-import org.json.JSONObject;
-import org.json.JSONPointer;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
 
@@ -45,14 +41,14 @@ public class LLMRequestImpl implements LLMRequest {
         log.info("Generating GraphQL query with textPrompt: {}, language: {}, context: {}", textPrompt, language, context);
         final LLMResponse response;
         if (shouldCallRealLLM) {
-            response = fecthQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel, returnLLMResponse);
+            response = fetchQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel, returnLLMResponse);
         } else {
             response = new LLMResponse(LLMResponseStatus.OK, MOCKED_QUERY_VALUE);
         }
         return response;
     }
 
-    private LLMResponse fecthQueryFromLLM(final String graphQlSchema, final String textPrompt, final String language,
+    private LLMResponse fetchQueryFromLLM(final String graphQlSchema, final String textPrompt, final String language,
                                           final Map<String, Object> context, final LLMModel llmModel,
                                           boolean returnLLMResponse) {
         final Map<String, Object> llmContext = generateLLMContext(language, context);
@@ -62,7 +58,6 @@ public class LLMRequestImpl implements LLMRequest {
             return switch (llmModel) {
                 case NOVA_PRO, TUNED_NOVA_PRO -> getLLMResponseNova(llmModel, prompt, returnLLMResponse);
                 case GPT_4_1_MINI, TUNED_GPT_4_1_MINI -> getGPTResponse(llmModel, prompt, returnLLMResponse);
-                default -> getLlmResponseDefault(llmModel, prompt);
             };
         } catch (SdkClientException e) {
             System.err.printf("ERROR: Can't invoke '%s'. Reason: %s", llmModel.getModelId(), e.getMessage());
@@ -118,15 +113,6 @@ public class LLMRequestImpl implements LLMRequest {
         return createLLMResponseFromActualResponse(response).refineQuery();
     }
 
-    private LLMResponse getLlmResponseDefault(LLMModel llmModel, String prompt) {
-        // Encode and send the request to the Bedrock Runtime.
-        var response = bedrockRuntimeClient.invokeModel(request -> request
-                .body(SdkBytes.fromUtf8String(prompt))
-                .modelId(llmModel.getModelId())
-        );
-        return fetchLLMResponse(response, llmModel).refineQuery();
-    }
-
     private Map<String, Object> generateLLMContext(String language, Map<String, Object> context) {
         final Map<String, Object> llmContext = new HashMap<>();
         if (context != null) {
@@ -141,16 +127,6 @@ public class LLMRequestImpl implements LLMRequest {
         }
 
         return llmContext;
-    }
-
-    private LLMResponse fetchLLMResponse(final InvokeModelResponse invokeResponse, final LLMModel llmModel) {
-        // Decode the response body.
-        final JSONObject responseBody = new JSONObject(invokeResponse.body().asUtf8String());
-
-        // Retrieve the generated text from the model's response.
-        final String rawResponse = new JSONPointer(llmModel.getResponsePath()).queryFrom(responseBody).toString();
-
-        return createLLMResponseFromActualResponse(rawResponse);
     }
 
     private LLMResponse createLLMResponseFromActualResponse(final String rawResponse) {
@@ -172,7 +148,6 @@ public class LLMRequestImpl implements LLMRequest {
 
     private String generatePrompt(final String graphQlSchema, final String textPrompt, final LLMModel llmModel,
                                   final String llmContext) {
-        return llmModel.getPromptTemplate()
-                .formatted(instructionsGenerator.generateFullInstructionsWithQuery(llmModel, llmContext, textPrompt, graphQlSchema));
+        return instructionsGenerator.generateFullInstructionsWithQuery(llmModel, llmContext, textPrompt, graphQlSchema);
     }
 }
