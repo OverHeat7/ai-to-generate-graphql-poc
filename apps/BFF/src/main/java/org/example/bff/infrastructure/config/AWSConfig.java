@@ -1,4 +1,4 @@
-package org.example.bff.config;
+package org.example.bff.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

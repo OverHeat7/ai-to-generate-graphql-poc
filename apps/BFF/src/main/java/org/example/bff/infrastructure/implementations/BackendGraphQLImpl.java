@@ -4,7 +4,7 @@ import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.AstPrinter;
 import graphql.language.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.example.bff.config.properties.BackendProperties;
+import org.example.bff.infrastructure.config.properties.BackendProperties;
 import org.example.bff.infrastructure.BackendGraphQL;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;

@@ -1,4 +1,4 @@
-package org.example.bff.config.properties;
+package org.example.bff.infrastructure.config.properties;
 
 import io.github.sashirestela.openai.SimpleOpenAI;
 import lombok.Data;

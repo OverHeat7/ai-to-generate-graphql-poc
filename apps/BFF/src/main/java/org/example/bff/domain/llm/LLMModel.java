@@ -13,8 +13,7 @@ public enum LLMModel {
     private final boolean isFineTuned;
     private final boolean needsFullInstructions;
 
-    LLMModel(final String modelId, final boolean isFineTuned,
-             final boolean needsFullInstructions) {
+    LLMModel(final String modelId, final boolean isFineTuned, final boolean needsFullInstructions) {
         this.modelId = modelId;
         this.isFineTuned = isFineTuned;
         this.needsFullInstructions = needsFullInstructions;
