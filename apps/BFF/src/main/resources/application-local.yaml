@@ -1,0 +1,8 @@
+management:
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  endpoint:
+    metrics:
+      enabled: off

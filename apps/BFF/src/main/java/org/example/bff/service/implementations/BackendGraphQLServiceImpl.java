@@ -8,6 +8,7 @@ import org.example.bff.properties.BackendProperties;
 import org.example.bff.service.BackendGraphQLService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -83,8 +84,12 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
     private final IntrospectionResultToSchema introspectionResultToSchema;
 
     public BackendGraphQLServiceImpl(final BackendProperties backendProperties) {
+        final HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        clientHttpRequestFactory.setConnectTimeout(2000);
+        clientHttpRequestFactory.setConnectionRequestTimeout(2000);
         this.restClient = RestClient.builder()
                 .baseUrl(backendProperties.getGraphqlUrl())
+                .requestFactory(clientHttpRequestFactory)
                 .build();
         this.introspectionResultToSchema = new IntrospectionResultToSchema();
     }

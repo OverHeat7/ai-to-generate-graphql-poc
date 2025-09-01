@@ -1,7 +1,8 @@
 package org.example.bff.domain.llm;
 
 public enum LLMResponseStatus {
-    SUCCESS,
+    OK,
     ERROR,
-    INFO
+    INFO,
+    UNKNOWN
 }

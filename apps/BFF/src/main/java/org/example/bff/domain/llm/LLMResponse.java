@@ -17,7 +17,7 @@ public class LLMResponse {
         this.status = status;
         this.message = message;
         switch (status) {
-            case SUCCESS -> log.info("LLM Response: {}", message);
+            case OK -> log.info("LLM Response: {}", message);
             case ERROR -> log.error("LLM Response Error: {}", message);
             case INFO -> log.info("LLM Response Info: {}", message);
             default -> log.warn("Unexpected LLM Response Status: {}", status);
@@ -25,7 +25,7 @@ public class LLMResponse {
     }
 
     public LLMResponse refineQuery() {
-        if (status == LLMResponseStatus.SUCCESS) {
+        if (status == LLMResponseStatus.OK) {
             this.message = message
                     .replace("\n", " ")
                     .replaceAll(" {2,}", " ");

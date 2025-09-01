@@ -12,3 +12,16 @@ llm:
   gpt-api-key: ${GPT_API_KEY:}
   gpt-organization-id: ${ORGANIZATION_ID:}
   gpt-project-id: ${PROJECT_ID:}
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+  defaults:
+    metrics:
+      export:
+        enabled: true
+  endpoint:
+    metrics:
+      enabled: true

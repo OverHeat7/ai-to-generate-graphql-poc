@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.bff.domain.llm.LLMModel;
 import org.example.bff.domain.llm.LLMResponse;
 import org.example.bff.domain.llm.LLMResponseStatus;
+import org.example.bff.metrics.BFFMetrics;
 import org.example.bff.service.LLMService;
 import org.example.bff.utils.LLMInstructionsGenerator;
 import org.json.JSONObject;
@@ -19,7 +20,6 @@ import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
-import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
@@ -32,6 +32,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class LLMServiceImpl implements LLMService {
     private static final String MOCKED_QUERY_VALUE = "{ searchPOIs( request: { latitude: 30.33218380000011 longitude: -81.655651 maxSearchDistance: 100000 isOpenNow: true services: [PHARMACY] searchQuery: \"2\" maxResults: 5 } ) { id name country services state address open24h position { latitude longitude } } }";
+    private BFFMetrics bffMetrics;
     private LLMInstructionsGenerator instructionsGenerator;
     private BedrockRuntimeClient bedrockRuntimeClient;
     private SimpleOpenAI openAi;
@@ -46,7 +47,7 @@ public class LLMServiceImpl implements LLMService {
         if (shouldCallRealLLM) {
             response = fecthQueryFromLLM(graphQlSchema, textPrompt, language, context, llmModel, returnLLMResponse);
         } else {
-            response = new LLMResponse(LLMResponseStatus.SUCCESS, MOCKED_QUERY_VALUE);
+            response = new LLMResponse(LLMResponseStatus.OK, MOCKED_QUERY_VALUE);
         }
         return response;
     }
@@ -95,7 +96,7 @@ public class LLMServiceImpl implements LLMService {
     }
 
     private static LLMResponse getLlmResponseRaw(String response) {
-        final LLMResponse llmResponse = new LLMResponse(LLMResponseStatus.SUCCESS, response);
+        final LLMResponse llmResponse = new LLMResponse(LLMResponseStatus.OK, response);
         if (response != null && response.startsWith("OK:")) {
             llmResponse.refineQuery();
         }
@@ -152,20 +153,20 @@ public class LLMServiceImpl implements LLMService {
         return createLLMResponseFromActualResponse(rawResponse);
     }
 
-    private static LLMResponse createLLMResponseFromActualResponse(final String rawResponse) {
+    private LLMResponse createLLMResponseFromActualResponse(final String rawResponse) {
         // extract the first "<chars>:" from the text, if it exists and remove it
         final LLMResponse response;
         if (rawResponse.startsWith("OK:")) {
-            response = new LLMResponse(LLMResponseStatus.SUCCESS, rawResponse.substring(3).trim());
-        } else if (rawResponse.startsWith("SUCCESS:")) {
-            response = new LLMResponse(LLMResponseStatus.SUCCESS, rawResponse.substring(8).trim());
+            response = new LLMResponse(LLMResponseStatus.OK, rawResponse.substring(3).trim());
         } else if (rawResponse.startsWith("ERROR:")) {
             response = new LLMResponse(LLMResponseStatus.ERROR, rawResponse.substring(6).trim());
         } else if (rawResponse.startsWith("INFO:")) {
             response = new LLMResponse(LLMResponseStatus.INFO, rawResponse.substring(5).trim());
         } else {
-            throw new RuntimeException("LLM response did not start with 'OK:', 'SUCCESS:', 'INFO:' or 'ERROR:'. Response: " + rawResponse);
+            bffMetrics.trackLLMResponseStatus(LLMResponseStatus.UNKNOWN);
+            throw new RuntimeException("LLM response did not start with 'OK:', 'INFO:' or 'ERROR:'. Response: " + rawResponse);
         }
+        bffMetrics.trackLLMResponseStatus(response.getStatus());
         return response;
     }
 
@@ -174,6 +175,4 @@ public class LLMServiceImpl implements LLMService {
         return llmModel.getPromptTemplate()
                 .formatted(instructionsGenerator.generateFullInstructionsWithQuery(llmModel, llmContext, textPrompt, graphQlSchema));
     }
-
-
 }
