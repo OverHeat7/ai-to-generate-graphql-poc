@@ -5,7 +5,7 @@ import graphql.language.AstPrinter;
 import graphql.language.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.example.bff.config.properties.BackendProperties;
-import org.example.bff.infrastructure.BackendGraphQLService;
+import org.example.bff.infrastructure.BackendGraphQL;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class BackendGraphQLServiceImpl implements BackendGraphQLService {
+public class BackendGraphQLImpl implements BackendGraphQL {
     private static final String INTROSPECTION_QUERY = """
             query IntrospectionQuery {
               __schema {
@@ -83,7 +83,7 @@ public class BackendGraphQLServiceImpl implements BackendGraphQLService {
     private final RestClient restClient;
     private final IntrospectionResultToSchema introspectionResultToSchema;
 
-    public BackendGraphQLServiceImpl(final BackendProperties backendProperties) {
+    public BackendGraphQLImpl(final BackendProperties backendProperties) {
         final HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         clientHttpRequestFactory.setConnectTimeout(2000);
         clientHttpRequestFactory.setConnectionRequestTimeout(2000);

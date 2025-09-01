@@ -5,6 +5,6 @@ import org.example.bff.domain.llm.LLMResponse;
 
 import java.util.Map;
 
-public interface LLMService {
+public interface LLMRequest {
     LLMResponse generateGraphQLQuery(String graphQlSchema, String textPrompt, String language, Map<String, Object> requestContext, LLMModel llmModel, boolean shouldCallRealLLM, boolean returnLLMResponse);
 }

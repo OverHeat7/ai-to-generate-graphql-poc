@@ -9,7 +9,7 @@ import org.example.bff.domain.llm.LLMModel;
 import org.example.bff.domain.llm.LLMResponse;
 import org.example.bff.domain.llm.LLMResponseStatus;
 import org.example.bff.metrics.BFFMetrics;
-import org.example.bff.infrastructure.LLMService;
+import org.example.bff.infrastructure.LLMRequest;
 import org.example.bff.utils.LLMInstructionsGenerator;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -30,7 +30,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class LLMServiceImpl implements LLMService {
+public class LLMRequestImpl implements LLMRequest {
     private static final String MOCKED_QUERY_VALUE = "{ searchPOIs( request: { latitude: 30.33218380000011 longitude: -81.655651 maxSearchDistance: 100000 isOpenNow: true services: [PHARMACY] searchQuery: \"2\" maxResults: 5 } ) { id name country services state address open24h position { latitude longitude } } }";
     private BFFMetrics bffMetrics;
     private LLMInstructionsGenerator instructionsGenerator;
