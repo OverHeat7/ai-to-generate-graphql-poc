@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum LLMModel {
     //    NOVA_MICRO("amazon.nova-micro-v1:0", "%s", null, false, true),
     NOVA_PRO("amazon.nova-pro-v1:0", "%s", null, false, true),
-    TUNED_NOVA_PRO("arn:aws:bedrock:us-east-1:366403523879:custom-model-deployment/9h6a2190f41c", "%s", null, true, true),
+    TUNED_NOVA_PRO("arn:aws:bedrock:us-east-1:918440787963:custom-model-deployment/8krk6i2bzts0", "%s", null, true, true),
     GPT_4_1_MINI("gpt-4.1-mini-2025-04-14", "%s",null,false,true),
     TUNED_GPT_4_1_MINI("ft:gpt-4.1-mini-2025-04-14:personal:fine-tuned:C6N7LlZJ", "%s",null,false,true);
 

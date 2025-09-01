@@ -111,7 +111,7 @@ public class LLMInstructionsGenerator {
               Input:
               context={} prompt='what can I do with this API?' schema={above}
             
-            Output:
+            Output (for english prompt, translate if prompt is in another language):
             INFO:Capabilities summary
             
             * The API supports searching for Points of Interest (POIs).
