@@ -18,7 +18,8 @@ public class V1Controller {
     private BFFService service;
 
     @PostMapping
-    public ResponseEntity<?> speechSearch(@RequestBody final RequestModel request, @RequestHeader(value = "Accept-Language", defaultValue = "en-gb") final String language) {
+    public ResponseEntity<?> speechSearch(@RequestBody final RequestModel request,
+                                          @RequestHeader(value = "Accept-Language", defaultValue = "en-gb") final String language) {
         return service.processRequest(request, language);
     }
 

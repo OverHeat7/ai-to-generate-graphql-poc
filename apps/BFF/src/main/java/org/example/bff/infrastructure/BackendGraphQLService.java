@@ -1,4 +1,4 @@
-package org.example.bff.service;
+package org.example.bff.infrastructure;
 
 
 public interface BackendGraphQLService {

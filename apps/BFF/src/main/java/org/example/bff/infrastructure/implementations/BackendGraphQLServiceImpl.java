@@ -1,11 +1,11 @@
-package org.example.bff.service.implementations;
+package org.example.bff.infrastructure.implementations;
 
 import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.AstPrinter;
 import graphql.language.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.example.bff.properties.BackendProperties;
-import org.example.bff.service.BackendGraphQLService;
+import org.example.bff.config.properties.BackendProperties;
+import org.example.bff.infrastructure.BackendGraphQLService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;

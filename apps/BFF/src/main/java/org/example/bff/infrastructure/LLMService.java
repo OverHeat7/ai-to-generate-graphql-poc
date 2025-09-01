@@ -1,4 +1,4 @@
-package org.example.bff.service;
+package org.example.bff.infrastructure;
 
 import org.example.bff.domain.llm.LLMModel;
 import org.example.bff.domain.llm.LLMResponse;

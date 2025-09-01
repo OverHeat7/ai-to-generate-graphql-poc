@@ -15,7 +15,7 @@ public class RequestModel {
 
     // Values used to configure llm (for easier testing)
     private LLMModel llmModel = LLMModel.NOVA_PRO;
-    private boolean shouldCallRealLLM = false;
+    private boolean shouldCallRealLLM = true;
     private boolean returnLLMResponse = false;
 }
 

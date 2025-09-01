@@ -1,4 +1,4 @@
-package org.example.bff.service.implementations;
+package org.example.bff.infrastructure.implementations;
 
 import io.github.sashirestela.openai.SimpleOpenAI;
 import io.github.sashirestela.openai.domain.chat.ChatMessage;
@@ -9,7 +9,7 @@ import org.example.bff.domain.llm.LLMModel;
 import org.example.bff.domain.llm.LLMResponse;
 import org.example.bff.domain.llm.LLMResponseStatus;
 import org.example.bff.metrics.BFFMetrics;
-import org.example.bff.service.LLMService;
+import org.example.bff.infrastructure.LLMService;
 import org.example.bff.utils.LLMInstructionsGenerator;
 import org.json.JSONObject;
 import org.json.JSONPointer;

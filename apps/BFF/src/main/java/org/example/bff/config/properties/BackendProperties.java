@@ -1,4 +1,4 @@
-package org.example.bff.properties;
+package org.example.bff.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

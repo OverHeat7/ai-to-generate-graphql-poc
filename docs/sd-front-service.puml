@@ -19,7 +19,11 @@ alt ERROR (was not able to generate query/mutation)
 else INFO (the user requested information)
     FrontService -> User: 200 OK\n{info}
 else OK (was hable to generate query/mutation)
+
     FrontService -> FrontService: validate <query|mutation>
+    alt invalid <query|mutation> for the schema
+        FrontService -> User: 500 Internal Server Error\n{error}
+    end
     FrontService -> APIPesquisa: Execute <query|mutation>
     activate APIPesquisa
     APIPesquisa -> FrontService: 200 OK\n{dados}\nOU\n500 Internal Server Error\n{error}

@@ -14,8 +14,8 @@ import org.example.bff.domain.llm.LLMResponse;
 import org.example.bff.domain.request.RequestModel;
 import org.example.bff.metrics.BFFMetrics;
 import org.example.bff.service.BFFService;
-import org.example.bff.service.LLMService;
-import org.example.bff.service.BackendGraphQLService;
+import org.example.bff.infrastructure.LLMService;
+import org.example.bff.infrastructure.BackendGraphQLService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
